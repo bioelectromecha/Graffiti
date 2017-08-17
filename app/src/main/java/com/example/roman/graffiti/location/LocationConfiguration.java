@@ -32,6 +32,7 @@ import java.io.IOException;
 
 import static java.lang.Math.abs;
 import static java.lang.Math.asin;
+import static java.lang.Math.tan;
 
 
 /**
@@ -53,12 +54,32 @@ public class LocationConfiguration {
     }
 
     protected static boolean isOnScreen (Location camL, Location grafL, Camera.Parameters camParameters){
+        // checks if the graffity needs to be displayed on the screen
         double verticalAngle = getVerticalAngle(camL,grafL);
         double horizontalAngle = getHorizontalAngle(camL,grafL);
         if (verticalAngle <= camParameters.getVerticalViewAngle()/2 && horizontalAngle <= camParameters.getHorizontalViewAngle()/2)
             return true;
         return false;
     }
+
+    protected static double convertWidthToPixels (Location camL, Location grafL, Camera.Parameters camParameters, float xScreenSize){
+        // returns the amounts of pixels in order to correct the size...
+        double horizontalAngle = getHorizontalAngle(camL,grafL);
+        double viewAngle = camParameters.getHorizontalViewAngle();
+        double y = (xScreenSize/2)/tan(viewAngle);
+        double z = y * tan(horizontalAngle);
+        return z;
+    }
+
+    protected static double convertHeightToPixels (Location camL, Location grafL, Camera.Parameters camParameters, float yScreenSize){
+        // // returns the amounts of pixels in order to correct the size...
+        double verticalAngle = getVerticalAngle(camL,grafL);
+        double viewAngle = camParameters.getVerticalViewAngle();
+        double y = (yScreenSize/2)/tan(viewAngle);
+        double z = y * tan(verticalAngle);
+        return z;
+    }
+
 
 }
 

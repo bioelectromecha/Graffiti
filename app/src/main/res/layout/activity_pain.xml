@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.example.roman.graffiti.activities.PainActivity">
+
+    <view
+        android:id="@+id/draw"
+        class="com.example.roman.graffiti.drawing.MyDrawView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        tools:layout_editor_absoluteX="16dp"
+        tools:layout_editor_absoluteY="8dp" />
+
+    <SeekBar
+        android:id="@+id/rude_seekbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:progress="5"
+        android:padding="16dp"
+        android:progressDrawable="@drawable/slider_progress"
+        android:thumb="@drawable/slider_thumb"
+        android:thumbOffset="0dp"
+        android:splitTrack="false"
+        android:max="10"
+        tools:layout_editor_absoluteY="211dp"
+        tools:layout_editor_absoluteX="148dp" />
+
+</RelativeLayout>

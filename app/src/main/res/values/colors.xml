@@ -3,4 +3,20 @@
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
+
+
+    <!--slider colors-->
+    <color name="slider_thumb">#E5E5E5</color>
+    <color name="slider_gradient_bottom">#F76B1C</color>
+    <color name="slider_gradient_mid">#FBDA61</color>
+    <color name="slider_gradient_top">#C9FB61</color>
+    <color name="slider_gradient_2">#F8872D</color>
+    <color name="slider_gradient_3">#F9A33F</color>
+    <color name="slider_gradient_4">#FABE50</color>
+    <color name="slider_gradient_6">#F1E161</color>
+    <color name="slider_gradient_7">#E7E761</color>
+    <color name="slider_gradient_8">#DDEE61</color>
+    <color name="slider_gradient_9">#D3F461</color>
+
+
 </resources>

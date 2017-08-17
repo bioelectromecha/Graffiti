@@ -1,4 +1,4 @@
-package com.example.roman.graffiti;
+package com.example.roman.graffiti.activities;
 
 import android.Manifest;
 import android.content.Intent;
@@ -13,6 +13,7 @@ import android.widget.Switch;
 import android.widget.Toast;
 
 import com.apkfuns.logutils.LogUtils;
+import com.example.roman.graffiti.R;
 
 public class PermissionsActivity extends AppCompatActivity {
 

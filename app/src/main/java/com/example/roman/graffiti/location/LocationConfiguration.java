@@ -1,34 +1,8 @@
 package com.example.roman.graffiti.location;
-import android.app.Activity;
-import android.content.Intent;
-import android.content.res.Configuration;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.PixelFormat;
-import android.graphics.drawable.Drawable;
 import android.hardware.Camera;
 import android.location.Location;
-import android.net.Uri;
-import android.os.Environment;
-import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
-import android.util.Log;
-import android.view.SurfaceHolder;
-import android.view.SurfaceView;
-import android.view.View;
-import android.view.ViewGroup;
-import android.view.Window;
-import android.view.WindowManager;
-import android.widget.Button;
-import android.widget.ImageView;
-import android.widget.RelativeLayout;
-import android.widget.Toast;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import com.apkfuns.logutils.LogUtils;
 
 import static java.lang.Math.abs;
 import static java.lang.Math.asin;
@@ -40,12 +14,17 @@ import static java.lang.Math.tan;
  */
 
 
-public class LocationConfiguration {
-    private static double defaultDistanceFromGraffity = 2.97; // initial distance between the camera and the grffiity
-    private static double maxDistanceFromGraffity = 10.0;
+public final class LocationConfiguration {
+    private static double minDistanceFromGraffiti = 5; // initial distance between the camera and the grffiity
+    private static double maxDistanceFromGraffity = 70;
+
+
+    private LocationConfiguration() {
+        // private constrcutor to avoid initializing
+    }
 
     // returns the vertical angle between the camera and the graffity image
-    protected static double getVerticalAngle (Location camL, Location grafL){
+    public static double getVerticalAngle (Location camL, Location grafL){
         double distance = camL.distanceTo(grafL);
         double heightDif = camL.getAltitude() - grafL.getAltitude();
         double verticalAngle = 0;
@@ -56,12 +35,13 @@ public class LocationConfiguration {
         return verticalAngle;
     }
 
-    protected static double getHorizontalAngle (Location camL, Location grafL){
+    public static double getHorizontalAngle (Location cameraLocation, Location graffitiLocation){
         // returns the horizontal angle between the camera and the graffity image
-        return camL.getBearing()-grafL.getBearing();
+        LogUtils.d("camera bearing: " + cameraLocation.getBearing() + " graffiti bearing: "+ graffitiLocation.getBearing());
+        return cameraLocation.bearingTo(graffitiLocation);
     }
 
-    protected static boolean isOnScreen (Location camL, Location grafL, Camera.Parameters camParameters){
+    public static boolean isOnScreen (Location camL, Location grafL, Camera.Parameters camParameters){
         // checks if the graffity needs to be displayed on the screen
         double verticalAngle = getVerticalAngle(camL,grafL);
         double horizontalAngle = abs(getHorizontalAngle(camL,grafL));
@@ -83,7 +63,7 @@ public class LocationConfiguration {
         return z;
     }
 
-    protected static double convertHeightToPixels (Location camL, Location grafL, Camera.Parameters camParameters, double yScreenSize){
+    public static double convertHeightToPixels (Location camL, Location grafL, Camera.Parameters camParameters, double yScreenSize){
         // returns the amounts of pixels in order to correct the size...
         double verticalAngle = getVerticalAngle(camL,grafL);
         double viewAngle = camParameters.getVerticalViewAngle();
@@ -98,19 +78,22 @@ public class LocationConfiguration {
 
     private static double getIncline (){
         // returns the distance graph incline
-        return 1/(defaultDistanceFromGraffity - maxDistanceFromGraffity);
+        return 1/(minDistanceFromGraffiti - maxDistanceFromGraffity);
     }
 
-    protected static double graffitySizeRatio (Location camL, Location grafL, double xScreenSize, double yScreenSize, double xGrafSize, double yGrafSize){
+    public static double graffitySizeRatio (Location camLocation, Location grafLocation){
         // returns the screen-graffity ratio
         double ratio = 0;
-        double distance = camL.distanceTo(grafL);
-        if (distance <= defaultDistanceFromGraffity)
+        double distance = camLocation.distanceTo(grafLocation);
+        LogUtils.d("distance = " + distance);
+        if (distance <= minDistanceFromGraffiti) {
             ratio = 1;
-        else if (distance >= maxDistanceFromGraffity)
+        } else if (distance >= maxDistanceFromGraffity) {
             ratio = 0;
-        else
-            ratio = getIncline() * distance - (getIncline() * maxDistanceFromGraffity);
+        }else {
+            ratio = (getIncline() * distance) - (getIncline() * maxDistanceFromGraffity);
+        }
+
         return ratio;
     }
 

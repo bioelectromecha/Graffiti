@@ -4,11 +4,11 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.example.roman.graffiti.activities.PainActivity">
+    tools:context="com.example.roman.graffiti.activities.DrawActivity">
 
     <view
         android:id="@+id/draw"
-        class="com.example.roman.graffiti.drawing.MyDrawView"
+        class="com.example.roman.graffiti.drawing.DrawView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         tools:layout_editor_absoluteX="16dp"

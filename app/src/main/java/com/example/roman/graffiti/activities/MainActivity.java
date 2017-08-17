@@ -10,6 +10,7 @@ import android.graphics.Canvas;
 import android.graphics.PixelFormat;
 import android.graphics.drawable.Drawable;
 import android.hardware.Camera;
+import android.location.Location;
 import android.net.Uri;
 import android.os.Environment;
 import android.os.ParcelFileDescriptor;
@@ -26,6 +27,8 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
+import com.apkfuns.logutils.LogUtils;
+import com.example.roman.graffiti.location.LocationConfiguration;
 import com.example.roman.graffiti.location.LocationHelper;
 import com.example.roman.graffiti.R;
 
@@ -35,22 +38,27 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-public class MainActivity extends Activity implements SurfaceHolder.Callback
-{
+public class MainActivity extends Activity implements SurfaceHolder.Callback {
     private static final int RESULT_LOAD_IMAGE = 403;
 
     private Camera camera = null;
-    private SurfaceView cameraSurfaceView = null;
+    private SurfaceView mCameraSurfaceView = null;
     private SurfaceHolder cameraSurfaceHolder = null;
-    private ImageView imageView = null;
+    private ImageView mImageView = null;
     private boolean previewing = false;
-    RelativeLayout relativeLayout;
+    private RelativeLayout relativeLayout;
     private Button btnCapture = null;
     private LocationHelper mLocationHelper;
+    private Location mGraffitiLocation = null;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState)
-    {
+    protected void onCreate(Bundle savedInstanceState) {
+
+        mGraffitiLocation = new Location("");
+        mGraffitiLocation.setLatitude(32.0629238);
+        mGraffitiLocation.setLongitude(34.7719123);
+        mGraffitiLocation.setAltitude(0);
+
         mLocationHelper = new LocationHelper(this);
         // TODO Auto-generated method stub
         super.onCreate(savedInstanceState);
@@ -63,42 +71,41 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback
 
         setContentView(R.layout.activity_main);
 
-        relativeLayout=(RelativeLayout) findViewById(R.id.containerImg);
+        relativeLayout = (RelativeLayout) findViewById(R.id.containerImg);
         relativeLayout.setDrawingCacheEnabled(true);
-        cameraSurfaceView = (SurfaceView)
+        mCameraSurfaceView = (SurfaceView)
                 findViewById(R.id.surfaceView1);
-        //  cameraSurfaceView.setLayoutParams(new FrameLayout.LayoutParams(640, 480));
-        cameraSurfaceHolder = cameraSurfaceView.getHolder();
+        //  mCameraSurfaceView.setLayoutParams(new FrameLayout.LayoutParams(640, 480));
+        cameraSurfaceHolder = mCameraSurfaceView.getHolder();
         cameraSurfaceHolder.addCallback(this);
         //    cameraSurfaceHolder.setType(SurfaceHolder.
         //                                               SURFACE_TYPE_PUSH_BUFFERS);
 
-        imageView=(ImageView) findViewById(R.id.imageView1);
+        mImageView = (ImageView) findViewById(R.id.imageView1);
 
-        btnCapture = (Button)findViewById(R.id.button1);
-        btnCapture.setOnClickListener(new View.OnClickListener()
-        {
+        btnCapture = (Button) findViewById(R.id.button1);
+        btnCapture.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v)
-            {
+            public void onClick(View v) {
 //                Random random = new Random();
-//                int x = random.nextInt(cameraSurfaceView.getWidth());
-//                int y = random.nextInt(cameraSurfaceView.getHeight());
+//                int x = random.nextInt(mCameraSurfaceView.getWidth());
+//                int y = random.nextInt(mCameraSurfaceView.getHeight());
 //                int size = random.nextInt(Math.min(x, y));
-//                imageView.setMinimumHeight(size);
-//                imageView.setMinimumWidth(size);
+//                mImageView.setMinimumHeight(size);
+//                mImageView.setMinimumWidth(size);
 
-//                ViewGroup.MarginLayoutParams marginParams = new ViewGroup.MarginLayoutParams(imageView.getLayoutParams());
+//                ViewGroup.MarginLayoutParams marginParams = new ViewGroup.MarginLayoutParams(mImageView.getLayoutParams());
 //                marginParams.setMargins(x, y, 0, 0);
 //                RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(marginParams);
-//                imageView.setLayoutParams(layoutParams);
+//                mImageView.setLayoutParams(layoutParams);
 
 //                Intent i = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
 //                startActivityForResult(i, RESULT_LOAD_IMAGE);
 
-                Intent intent = new Intent(getApplicationContext(),PainActivity.class);
-                startActivity(intent);
-                finish();
+//                Intent intent = new Intent(getApplicationContext(),DrawActivity.class);
+//                startActivity(intent);
+//                finish();
+
             }
         });
     }
@@ -115,35 +122,29 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback
         mLocationHelper.stopLocationUpdates();
     }
 
-    Camera.ShutterCallback cameraShutterCallback = new Camera.ShutterCallback()
-    {
+    Camera.ShutterCallback cameraShutterCallback = new Camera.ShutterCallback() {
         @Override
-        public void onShutter()
-        {
+        public void onShutter() {
             // TODO Auto-generated method stub
         }
     };
 
-    Camera.PictureCallback cameraPictureCallbackRaw = new Camera.PictureCallback()
-    {
+    Camera.PictureCallback cameraPictureCallbackRaw = new Camera.PictureCallback() {
         @Override
-        public void onPictureTaken(byte[] data, Camera camera)
-        {
+        public void onPictureTaken(byte[] data, Camera camera) {
             // TODO Auto-generated method stub
         }
     };
 
-    Camera.PictureCallback cameraPictureCallbackJpeg = new Camera.PictureCallback()
-    {
+    Camera.PictureCallback cameraPictureCallbackJpeg = new Camera.PictureCallback() {
         @Override
-        public void onPictureTaken(byte[] data, Camera camera)
-        {
+        public void onPictureTaken(byte[] data, Camera camera) {
             // TODO Auto-generated method stub
             Bitmap cameraBitmap = BitmapFactory.decodeByteArray
                     (data, 0, data.length);
 
-            int   wid = cameraBitmap.getWidth();
-            int  hgt = cameraBitmap.getHeight();
+            int wid = cameraBitmap.getWidth();
+            int hgt = cameraBitmap.getHeight();
 
             //  Toast.makeText(getApplicationContext(), wid+""+hgt, Toast.LENGTH_SHORT).show();
             Bitmap newImage = Bitmap.createBitmap
@@ -155,9 +156,8 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback
 
             Drawable drawable = getResources().getDrawable
                     (R.mipmap.ic_launcher);
-            drawable.setBounds(20, 30, drawable.getIntrinsicWidth()+20, drawable.getIntrinsicHeight()+30);
+            drawable.setBounds(20, 30, drawable.getIntrinsicWidth() + 20, drawable.getIntrinsicHeight() + 30);
             drawable.draw(canvas);
-
 
 
             File storagePath = new File(Environment.
@@ -167,21 +167,16 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback
             File myImage = new File(storagePath,
                     Long.toString(System.currentTimeMillis()) + ".jpg");
 
-            try
-            {
+            try {
                 FileOutputStream out = new FileOutputStream(myImage);
                 newImage.compress(Bitmap.CompressFormat.JPEG, 80, out);
 
 
                 out.flush();
                 out.close();
-            }
-            catch(FileNotFoundException e)
-            {
+            } catch (FileNotFoundException e) {
                 Log.d("In Saving File", e + "");
-            }
-            catch(IOException e)
-            {
+            } catch (IOException e) {
                 Log.d("In Saving File", e + "");
             }
 
@@ -202,17 +197,14 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback
 
     @Override
     public void surfaceChanged(SurfaceHolder holder,
-                               int format, int width, int height)
-    {
+                               int format, int width, int height) {
         // TODO Auto-generated method stub
 
-        if(previewing)
-        {
+        if (previewing) {
             camera.stopPreview();
             previewing = false;
         }
-        try
-        {
+        try {
             Camera.Parameters parameters = camera.getParameters();
 //            TODO: give it to amit
 //            LogUtils.d("horizontal view angle: " + camera.getParameters().getHorizontalViewAngle());
@@ -231,31 +223,24 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback
             camera.setPreviewDisplay(cameraSurfaceHolder);
             camera.startPreview();
             previewing = true;
-        }
-        catch (IOException e)
-        {
+        } catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
     }
 
     @Override
-    public void surfaceCreated(SurfaceHolder holder)
-    {
+    public void surfaceCreated(SurfaceHolder holder) {
         // TODO Auto-generated method stub
-        try
-        {
+        try {
             camera = Camera.open();
-        }
-        catch(RuntimeException e)
-        {
+        } catch (RuntimeException e) {
             Toast.makeText(getApplicationContext(), "Device camera  is not working properly, please try after sometime.", Toast.LENGTH_LONG).show();
         }
     }
 
     @Override
-    public void surfaceDestroyed(SurfaceHolder holder)
-    {
+    public void surfaceDestroyed(SurfaceHolder holder) {
         // TODO Auto-generated method stub
         camera.stopPreview();
         camera.release();
@@ -285,10 +270,8 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            imageView.setImageBitmap(bmp);
-
+            mImageView.setImageBitmap(bmp);
         }
-
     }
 
     private Bitmap getBitmapFromUri(Uri uri) throws IOException {
@@ -297,6 +280,29 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback
         Bitmap image = BitmapFactory.decodeFileDescriptor(fileDescriptor);
         parcelFileDescriptor.close();
         return image;
+    }
+
+    public void updateGraffitiSize(Location cameraLocation) {
+        if (mGraffitiLocation != null) {
+            double ratio = LocationConfiguration.graffitySizeRatio(cameraLocation, mGraffitiLocation);
+            int width = mCameraSurfaceView.getWidth();
+            int height = mCameraSurfaceView.getHeight();
+
+            double bearingDif = LocationConfiguration.getHorizontalAngle(cameraLocation, mGraffitiLocation);
+
+            if (ratio != 0) {
+                mImageView.setVisibility(View.VISIBLE);
+                width = (int) (width * ratio);
+                height = (int) (height * ratio);
+            }else{
+                mImageView.setVisibility(View.INVISIBLE);
+            }
+            mImageView.setMinimumHeight(height);
+            mImageView.setMaxHeight(height);
+            mImageView.setMinimumWidth(width);
+            mImageView.setMaxWidth(width);
+            LogUtils.d("image size changed " + width+ " , " + height+" , " + ratio + " , "+ bearingDif);
+        }
     }
 
 }

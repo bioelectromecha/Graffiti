@@ -8,12 +8,12 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.SeekBar;
 
-import com.example.roman.graffiti.drawing.MyDrawView;
+import com.example.roman.graffiti.drawing.DrawView;
 import com.example.roman.graffiti.R;
 
-public class PainActivity extends AppCompatActivity {
+public class DrawActivity extends AppCompatActivity {
 
-    private MyDrawView myDrawView;
+    private DrawView myDrawView;
 
     private SeekBar mRudeSeekbar;
 
@@ -22,7 +22,7 @@ public class PainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_pain);
-        myDrawView = (MyDrawView) findViewById(R.id.draw);
+        myDrawView = (DrawView) findViewById(R.id.draw);
         mRudeSeekbar = (SeekBar) findViewById(R.id.rude_seekbar);
 
         mContext = this;

@@ -5,6 +5,7 @@ import android.location.Location;
 import android.os.Bundle;
 
 import com.apkfuns.logutils.LogUtils;
+import com.example.roman.graffiti.activities.MainActivity;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationRequest;
@@ -23,13 +24,15 @@ public class LocationHelper implements
     private GoogleApiClient mGoogleApiClient;
     private LocationRequest mLocationRequest;
     private Location mLastLocation = null;
-    private final int LOCATION_UPDATE_INTERVAL = 2000  ;
+    private final int LOCATION_UPDATE_INTERVAL = 1;
+    private MainActivity mCallbackActivity;
 
-    public LocationHelper(Context mContext){
-        LogUtils.d("LocationHelper");
+    public LocationHelper(MainActivity activity){
+
+        mCallbackActivity = activity;
 
         // bind the google api client - for user location
-        mGoogleApiClient = new GoogleApiClient.Builder(mContext)
+        mGoogleApiClient = new GoogleApiClient.Builder(mCallbackActivity)
                 .addApi(LocationServices.API)
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
@@ -37,14 +40,12 @@ public class LocationHelper implements
     }
 
     public void startLocationUpdates(){
-        LogUtils.d("start");
         //connect the api
         mGoogleApiClient.connect();
     }
 
 
     public void stopLocationUpdates(){
-        LogUtils.d("stop");
         // disconnect the api
         mGoogleApiClient.disconnect();
     }
@@ -53,7 +54,8 @@ public class LocationHelper implements
     @Override
     public void onLocationChanged(Location location) {
         mLastLocation=location;
-        LogUtils.d(mLastLocation.getBearing());
+        LogUtils.d("Location is: " + mLastLocation.getLatitude() + " , " + mLastLocation.getLongitude() + " , " + mLastLocation.getAltitude());
+        mCallbackActivity.updateGraffitiSize(mLastLocation);
     }
 
 
@@ -93,5 +95,9 @@ public class LocationHelper implements
             LogUtils.d(e.getMessage());
             e.printStackTrace();
         }
+    }
+
+    public Location getLastLocation() {
+        return mLastLocation;
     }
 }

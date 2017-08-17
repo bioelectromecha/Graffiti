@@ -61,7 +61,6 @@ public class PermissionsActivity extends AppCompatActivity {
             mLocationSwitch.setChecked(true);
             mLocationSwitch.setClickable(false);
         }
-        LogUtils.d("after   location checked");
 
         if(checkStoragePermission()){
             mStorageSwitch.setChecked(true);

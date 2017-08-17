@@ -16,7 +16,7 @@ import com.example.roman.graffiti.R;
  * Created by roman on 8/17/17.
  */
 
-public class MyDrawView extends View {
+public class DrawView extends View {
 
     public Bitmap mBitmap, bitmapBackup;
     public Canvas mCanvas, bitmapBackupCanvas;
@@ -26,7 +26,7 @@ public class MyDrawView extends View {
     public String shape;
     boolean undofresh;
 
-    public MyDrawView(Context c, AttributeSet attrs) {
+    public DrawView(Context c, AttributeSet attrs) {
         super(c, attrs);
 
         shape = "normal";
@@ -37,11 +37,11 @@ public class MyDrawView extends View {
         mPaint.setAntiAlias(true);
         mPaint.setDither(true);
 
-        mPaint.setColor(getContext().getResources().getColor(R.color.colorAccent));
+        mPaint.setColor(getContext().getResources().getColor(R.color.colorPrimary));
         mPaint.setStyle(Paint.Style.STROKE);
         mPaint.setStrokeJoin(Paint.Join.ROUND);
         mPaint.setStrokeCap(Paint.Cap.ROUND);
-        mPaint.setStrokeWidth(70);
+        mPaint.setStrokeWidth(50);
 
 //        tPaint = new Paint();
 //        tPaint.setStrokeCap(Paint.Cap.ROUND);
@@ -191,6 +191,6 @@ public class MyDrawView extends View {
         invalidate();
         System.gc();
 
-        MyDrawView.this.setBackgroundColor(Color.parseColor("#ffffff"));
+        DrawView.this.setBackgroundColor(Color.parseColor("#ffffff"));
     }
 }

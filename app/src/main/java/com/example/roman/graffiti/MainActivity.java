@@ -3,14 +3,19 @@ package com.example.roman.graffiti;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.PixelFormat;
 import android.graphics.drawable.Drawable;
 import android.hardware.Camera;
+import android.location.Location;
 import android.net.Uri;
 import android.os.Environment;
+import android.os.ParcelFileDescriptor;
+import android.provider.MediaStore;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -30,10 +35,8 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-
 public class MainActivity extends Activity implements SurfaceHolder.Callback
 {
-    //EMANUEL IS CALLING YOU!
     private Camera camera = null;
     private SurfaceView cameraSurfaceView = null;
     private SurfaceHolder cameraSurfaceHolder = null;
@@ -43,8 +46,8 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback
     private Button btnCapture = null;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-
+    protected void onCreate(Bundle savedInstanceState)
+    {
         // TODO Auto-generated method stub
         super.onCreate(savedInstanceState);
 
@@ -56,7 +59,7 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback
 
         setContentView(R.layout.activity_main);
 
-        relativeLayout = (RelativeLayout) findViewById(R.id.containerImg);
+        relativeLayout=(RelativeLayout) findViewById(R.id.containerImg);
         relativeLayout.setDrawingCacheEnabled(true);
         cameraSurfaceView = (SurfaceView)
                 findViewById(R.id.surfaceView1);
@@ -66,12 +69,14 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback
         //    cameraSurfaceHolder.setType(SurfaceHolder.
         //                                               SURFACE_TYPE_PUSH_BUFFERS);
 
-        imageView = (ImageView) findViewById(R.id.imageView1);
+        imageView=(ImageView) findViewById(R.id.imageView1);
 
-        btnCapture = (Button) findViewById(R.id.button1);
-        btnCapture.setOnClickListener(new View.OnClickListener() {
+        btnCapture = (Button)findViewById(R.id.button1);
+        btnCapture.setOnClickListener(new View.OnClickListener()
+        {
             @Override
-            public void onClick(View v) {
+            public void onClick(View v)
+            {
                 ViewGroup.MarginLayoutParams marginParams = new ViewGroup.MarginLayoutParams(imageView.getLayoutParams());
                 marginParams.setMargins(50, 50, 0, 0);
                 RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(marginParams);

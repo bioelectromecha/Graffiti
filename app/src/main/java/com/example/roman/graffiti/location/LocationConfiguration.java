@@ -47,20 +47,24 @@ public class LocationConfiguration {
     // returns the vertical angle between the camera and the graffity image
     protected static double getVerticalAngle (Location camL, Location grafL){
         double distance = camL.distanceTo(grafL);
-        double heightDif = abs(camL.getAltitude() - grafL.getAltitude());
-        double verticalAngle = asin(heightDif/distance);
+        double heightDif = camL.getAltitude() - grafL.getAltitude();
+        double verticalAngle = 0;
+        if (heightDif >= 0)
+                verticalAngle = asin(heightDif/distance);
+        else
+                verticalAngle = -asin(-heightDif/distance);
         return verticalAngle;
     }
 
     protected static double getHorizontalAngle (Location camL, Location grafL){
         // returns the horizontal angle between the camera and the graffity image
-        return abs(camL.getBearing()-grafL.getBearing());
+        return camL.getBearing()-grafL.getBearing();
     }
 
     protected static boolean isOnScreen (Location camL, Location grafL, Camera.Parameters camParameters){
         // checks if the graffity needs to be displayed on the screen
         double verticalAngle = getVerticalAngle(camL,grafL);
-        double horizontalAngle = getHorizontalAngle(camL,grafL);
+        double horizontalAngle = abs(getHorizontalAngle(camL,grafL));
         if (verticalAngle <= camParameters.getVerticalViewAngle()/2 && horizontalAngle <= camParameters.getHorizontalViewAngle()/2)
             return true;
         return false;
@@ -71,7 +75,11 @@ public class LocationConfiguration {
         double horizontalAngle = getHorizontalAngle(camL,grafL);
         double viewAngle = camParameters.getHorizontalViewAngle();
         double y = (xScreenSize/2)/tan(viewAngle);
-        double z = y * tan(horizontalAngle);
+        double z = 0;
+        if (horizontalAngle >=0)
+            z = y * tan(horizontalAngle);
+        else
+            z = -(y * tan(-horizontalAngle));
         return z;
     }
 
@@ -80,7 +88,11 @@ public class LocationConfiguration {
         double verticalAngle = getVerticalAngle(camL,grafL);
         double viewAngle = camParameters.getVerticalViewAngle();
         double y = (yScreenSize/2)/tan(viewAngle);
-        double z = y * tan(verticalAngle);
+        double z = 0;
+        if (verticalAngle >=0)
+            z = y * tan(verticalAngle);
+        else
+            z = -(y * tan(-verticalAngle));
         return z;
     }
 

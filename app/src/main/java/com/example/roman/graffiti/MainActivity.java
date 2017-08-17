@@ -9,6 +9,7 @@ import android.graphics.Canvas;
 import android.graphics.PixelFormat;
 import android.graphics.drawable.Drawable;
 import android.hardware.Camera;
+import android.location.Location;
 import android.net.Uri;
 import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
@@ -29,6 +30,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Random;
 
 public class MainActivity extends Activity implements SurfaceHolder.Callback
 {
@@ -39,10 +41,12 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback
     private boolean previewing = false;
     RelativeLayout relativeLayout;
     private Button btnCapture = null;
+    private LocationHelper mLocationHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
+        mLocationHelper = new LocationHelper(this);
         // TODO Auto-generated method stub
         super.onCreate(savedInstanceState);
 
@@ -72,12 +76,30 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback
             @Override
             public void onClick(View v)
             {
-                ViewGroup.MarginLayoutParams marginParams = new ViewGroup.MarginLayoutParams(imageView.getLayoutParams());
-                marginParams.setMargins(50, 50, 0, 0);
-                RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(marginParams);
-                imageView.setLayoutParams(layoutParams);
+                Random random = new Random();
+                int x = random.nextInt(cameraSurfaceView.getWidth());
+                int y = random.nextInt(cameraSurfaceView.getHeight());
+                int size = random.nextInt(Math.min(x, y));
+                imageView.setMinimumHeight(size);
+                imageView.setMinimumWidth(size);
+//                ViewGroup.MarginLayoutParams marginParams = new ViewGroup.MarginLayoutParams(imageView.getLayoutParams());
+//                marginParams.setMargins(x, y, 0, 0);
+//                RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(marginParams);
+//                imageView.setLayoutParams(layoutParams);
             }
         });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mLocationHelper.startLocationUpdates();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        mLocationHelper.stopLocationUpdates();
     }
 
     Camera.ShutterCallback cameraShutterCallback = new Camera.ShutterCallback()

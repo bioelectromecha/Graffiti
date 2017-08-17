@@ -26,7 +26,10 @@ dependencies {
     })
     compile 'com.android.support:appcompat-v7:26.+'
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
+    // LogUtils library
     compile 'com.apkfuns.logutils:library:1.5.1.1'
+    // Location Services API lib
+    compile 'com.google.android.gms:play-services-location:11.0.4'
 
     testCompile 'junit:junit:4.12'
 }

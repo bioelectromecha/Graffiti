@@ -3,6 +3,7 @@ package com.example.roman.graffiti;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -12,6 +13,9 @@ import android.hardware.Camera;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Environment;
+import android.os.ParcelFileDescriptor;
+import android.provider.MediaStore;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -26,7 +30,10 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
+import com.apkfuns.logutils.LogUtils;
+
 import java.io.File;
+import java.io.FileDescriptor;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -34,6 +41,8 @@ import java.util.Random;
 
 public class MainActivity extends Activity implements SurfaceHolder.Callback
 {
+    private static final int RESULT_LOAD_IMAGE = 403;
+
     private Camera camera = null;
     private SurfaceView cameraSurfaceView = null;
     private SurfaceHolder cameraSurfaceHolder = null;
@@ -76,16 +85,20 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback
             @Override
             public void onClick(View v)
             {
-                Random random = new Random();
-                int x = random.nextInt(cameraSurfaceView.getWidth());
-                int y = random.nextInt(cameraSurfaceView.getHeight());
-                int size = random.nextInt(Math.min(x, y));
-                imageView.setMinimumHeight(size);
-                imageView.setMinimumWidth(size);
+//                Random random = new Random();
+//                int x = random.nextInt(cameraSurfaceView.getWidth());
+//                int y = random.nextInt(cameraSurfaceView.getHeight());
+//                int size = random.nextInt(Math.min(x, y));
+//                imageView.setMinimumHeight(size);
+//                imageView.setMinimumWidth(size);
+
 //                ViewGroup.MarginLayoutParams marginParams = new ViewGroup.MarginLayoutParams(imageView.getLayoutParams());
 //                marginParams.setMargins(x, y, 0, 0);
 //                RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(marginParams);
 //                imageView.setLayoutParams(layoutParams);
+
+                Intent i = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                startActivityForResult(i, RESULT_LOAD_IMAGE);
             }
         });
     }
@@ -175,7 +188,6 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback
             camera.startPreview();
 
 
-
             newImage.recycle();
             newImage = null;
 
@@ -202,6 +214,9 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback
         try
         {
             Camera.Parameters parameters = camera.getParameters();
+//            TODO: give it to amit
+//            LogUtils.d("horizontal view angle: " + camera.getParameters().getHorizontalViewAngle());
+//            LogUtils.d("vertical view angle: " + camera.getParameters().getVerticalViewAngle());
             parameters.setPreviewSize(640, 480);
             parameters.setPictureSize(640, 480);
             if (this.getResources().getConfiguration().orientation != Configuration.ORIENTATION_LANDSCAPE) {
@@ -246,4 +261,41 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback
         camera = null;
         previewing = false;
     }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == RESULT_LOAD_IMAGE && resultCode == RESULT_OK && null != data) {
+            Uri selectedImage = data.getData();
+            String[] filePathColumn = {MediaStore.Images.Media.DATA};
+
+            Cursor cursor = getContentResolver().query(selectedImage,
+                    filePathColumn, null, null, null);
+            cursor.moveToFirst();
+
+            int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
+            String picturePath = cursor.getString(columnIndex);
+            cursor.close();
+
+            Bitmap bmp = null;
+            try {
+                bmp = getBitmapFromUri(selectedImage);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            imageView.setImageBitmap(bmp);
+
+        }
+
+    }
+
+    private Bitmap getBitmapFromUri(Uri uri) throws IOException {
+        ParcelFileDescriptor parcelFileDescriptor = getContentResolver().openFileDescriptor(uri, "r");
+        FileDescriptor fileDescriptor = parcelFileDescriptor.getFileDescriptor();
+        Bitmap image = BitmapFactory.decodeFileDescriptor(fileDescriptor);
+        parcelFileDescriptor.close();
+        return image;
+    }
+
 }

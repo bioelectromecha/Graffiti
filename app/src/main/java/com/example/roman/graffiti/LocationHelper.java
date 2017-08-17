@@ -18,6 +18,7 @@ public class LocationHelper implements
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener, com.google.android.gms.location.LocationListener {
 
+
     // location services stuff
     private GoogleApiClient mGoogleApiClient;
     private LocationRequest mLocationRequest;
@@ -54,6 +55,7 @@ public class LocationHelper implements
         mLastLocation=location;
         LogUtils.d(mLastLocation.getBearing());
     }
+
 
     @Override
     public void onConnected(Bundle bundle) {

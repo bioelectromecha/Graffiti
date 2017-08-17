@@ -1,4 +1,4 @@
-package com.example.roman.graffiti;
+package com.example.roman.graffiti.drawing;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -9,6 +9,8 @@ import android.graphics.Path;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
+
+import com.example.roman.graffiti.R;
 
 /**
  * Created by roman on 8/17/17.

@@ -1,4 +1,4 @@
-package com.example.roman.graffiti;
+package com.example.roman.graffiti.activities;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -10,19 +10,15 @@ import android.graphics.Canvas;
 import android.graphics.PixelFormat;
 import android.graphics.drawable.Drawable;
 import android.hardware.Camera;
-import android.location.Location;
 import android.net.Uri;
 import android.os.Environment;
 import android.os.ParcelFileDescriptor;
 import android.provider.MediaStore;
-import android.support.annotation.NonNull;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
@@ -30,13 +26,19 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
+import com.example.roman.graffiti.location.LocationHelper;
+import com.example.roman.graffiti.R;
+
 import java.io.File;
+import java.io.FileDescriptor;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
 public class MainActivity extends Activity implements SurfaceHolder.Callback
 {
+    private static final int RESULT_LOAD_IMAGE = 403;
+
     private Camera camera = null;
     private SurfaceView cameraSurfaceView = null;
     private SurfaceHolder cameraSurfaceHolder = null;
@@ -44,10 +46,12 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback
     private boolean previewing = false;
     RelativeLayout relativeLayout;
     private Button btnCapture = null;
+    private LocationHelper mLocationHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
+        mLocationHelper = new LocationHelper(this);
         // TODO Auto-generated method stub
         super.onCreate(savedInstanceState);
 
@@ -77,12 +81,38 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback
             @Override
             public void onClick(View v)
             {
-                ViewGroup.MarginLayoutParams marginParams = new ViewGroup.MarginLayoutParams(imageView.getLayoutParams());
-                marginParams.setMargins(50, 50, 0, 0);
-                RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(marginParams);
-                imageView.setLayoutParams(layoutParams);
+//                Random random = new Random();
+//                int x = random.nextInt(cameraSurfaceView.getWidth());
+//                int y = random.nextInt(cameraSurfaceView.getHeight());
+//                int size = random.nextInt(Math.min(x, y));
+//                imageView.setMinimumHeight(size);
+//                imageView.setMinimumWidth(size);
+
+//                ViewGroup.MarginLayoutParams marginParams = new ViewGroup.MarginLayoutParams(imageView.getLayoutParams());
+//                marginParams.setMargins(x, y, 0, 0);
+//                RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(marginParams);
+//                imageView.setLayoutParams(layoutParams);
+
+//                Intent i = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+//                startActivityForResult(i, RESULT_LOAD_IMAGE);
+
+                Intent intent = new Intent(getApplicationContext(),PainActivity.class);
+                startActivity(intent);
+                finish();
             }
         });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mLocationHelper.startLocationUpdates();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        mLocationHelper.stopLocationUpdates();
     }
 
     Camera.ShutterCallback cameraShutterCallback = new Camera.ShutterCallback()
@@ -158,7 +188,6 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback
             camera.startPreview();
 
 
-
             newImage.recycle();
             newImage = null;
 
@@ -185,6 +214,10 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback
         try
         {
             Camera.Parameters parameters = camera.getParameters();
+//            TODO: give it to amit
+//            LogUtils.d("horizontal view angle: " + camera.getParameters().getHorizontalViewAngle());
+//            LogUtils.d("vertical view angle: " + camera.getParameters().getVerticalViewAngle());
+
             parameters.setPreviewSize(640, 480);
             parameters.setPictureSize(640, 480);
             if (this.getResources().getConfiguration().orientation != Configuration.ORIENTATION_LANDSCAPE) {
@@ -229,4 +262,41 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback
         camera = null;
         previewing = false;
     }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == RESULT_LOAD_IMAGE && resultCode == RESULT_OK && null != data) {
+            Uri selectedImage = data.getData();
+            String[] filePathColumn = {MediaStore.Images.Media.DATA};
+
+            Cursor cursor = getContentResolver().query(selectedImage,
+                    filePathColumn, null, null, null);
+            cursor.moveToFirst();
+
+            int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
+            String picturePath = cursor.getString(columnIndex);
+            cursor.close();
+
+            Bitmap bmp = null;
+            try {
+                bmp = getBitmapFromUri(selectedImage);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            imageView.setImageBitmap(bmp);
+
+        }
+
+    }
+
+    private Bitmap getBitmapFromUri(Uri uri) throws IOException {
+        ParcelFileDescriptor parcelFileDescriptor = getContentResolver().openFileDescriptor(uri, "r");
+        FileDescriptor fileDescriptor = parcelFileDescriptor.getFileDescriptor();
+        Bitmap image = BitmapFactory.decodeFileDescriptor(fileDescriptor);
+        parcelFileDescriptor.close();
+        return image;
+    }
+
 }

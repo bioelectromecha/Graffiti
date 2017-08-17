@@ -1,4 +1,4 @@
-package com.example.roman.graffiti;
+package com.example.roman.graffiti.location;
 
 import android.content.Context;
 import android.location.Location;

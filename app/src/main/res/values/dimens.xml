@@ -1,5 +1,10 @@
 <resources>
 
+    <!--seekbar stuff-->
+    <dimen name="slider_thumb_size">35dp</dimen>
+    <dimen name="slider_corner_radius">7dp</dimen>
+    <dimen name="seekbar_height">38dp</dimen>
+
     <!--text sizes-->
     <dimen name="large_title_text">32sp</dimen>
     <dimen name="medium_title_text">24sp</dimen>
@@ -20,5 +25,6 @@
     <!-- Default screen margins, per the Android Design guidelines. -->
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
+    <dimen name="fab_margin">16dp</dimen>
 
 </resources>

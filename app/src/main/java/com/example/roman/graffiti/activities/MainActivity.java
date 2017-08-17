@@ -28,6 +28,7 @@ import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.apkfuns.logutils.LogUtils;
+import com.example.roman.graffiti.location.Compass;
 import com.example.roman.graffiti.location.LocationConfiguration;
 import com.example.roman.graffiti.location.LocationHelper;
 import com.example.roman.graffiti.R;
@@ -49,11 +50,12 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
     private RelativeLayout relativeLayout;
     private Button btnCapture = null;
     private LocationHelper mLocationHelper;
+    private Compass mCompass;
     private Location mGraffitiLocation = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
+        mCompass = new Compass(this);
         mGraffitiLocation = new Location("");
         mGraffitiLocation.setLatitude(32.0629238);
         mGraffitiLocation.setLongitude(34.7719123);
@@ -114,12 +116,14 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
     protected void onResume() {
         super.onResume();
         mLocationHelper.startLocationUpdates();
+        mCompass.start();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
         mLocationHelper.stopLocationUpdates();
+        mCompass.stop();
     }
 
     Camera.ShutterCallback cameraShutterCallback = new Camera.ShutterCallback() {

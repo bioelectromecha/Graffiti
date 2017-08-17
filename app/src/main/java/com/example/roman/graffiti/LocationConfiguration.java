@@ -39,7 +39,11 @@ import static java.lang.Math.tan;
  * Created by amit nissan on 8/17/2017.
  */
 
+
 public class LocationConfiguration {
+    private static double defaultDistanceFromGraffity = 2.97; // initial distance between the camera and the grffiity
+    private static double maxDistanceFromGraffity = 10.0;
+
     // returns the vertical angle between the camera and the graffity image
     protected static double getVerticalAngle (Location camL, Location grafL){
         double distance = camL.distanceTo(grafL);
@@ -62,7 +66,7 @@ public class LocationConfiguration {
         return false;
     }
 
-    protected static double convertWidthToPixels (Location camL, Location grafL, Camera.Parameters camParameters, float xScreenSize){
+    protected static double convertWidthToPixels (Location camL, Location grafL, Camera.Parameters camParameters, double xScreenSize){
         // returns the amounts of pixels in order to correct the size...
         double horizontalAngle = getHorizontalAngle(camL,grafL);
         double viewAngle = camParameters.getHorizontalViewAngle();
@@ -71,13 +75,31 @@ public class LocationConfiguration {
         return z;
     }
 
-    protected static double convertHeightToPixels (Location camL, Location grafL, Camera.Parameters camParameters, float yScreenSize){
-        // // returns the amounts of pixels in order to correct the size...
+    protected static double convertHeightToPixels (Location camL, Location grafL, Camera.Parameters camParameters, double yScreenSize){
+        // returns the amounts of pixels in order to correct the size...
         double verticalAngle = getVerticalAngle(camL,grafL);
         double viewAngle = camParameters.getVerticalViewAngle();
         double y = (yScreenSize/2)/tan(viewAngle);
         double z = y * tan(verticalAngle);
         return z;
+    }
+
+    private static double getIncline (){
+        // returns the distance graph incline
+        return 1/(defaultDistanceFromGraffity - maxDistanceFromGraffity);
+    }
+
+    protected static double graffitySizeRatio (Location camL, Location grafL, double xScreenSize, double yScreenSize, double xGrafSize, double yGrafSize){
+        // returns the screen-graffity ratio
+        double ratio = 0;
+        double distance = camL.distanceTo(grafL);
+        if (distance <= defaultDistanceFromGraffity)
+            ratio = 1;
+        else if (distance >= maxDistanceFromGraffity)
+            ratio = 0;
+        else
+            ratio = getIncline() * distance - (getIncline() * maxDistanceFromGraffity);
+        return ratio;
     }
 
 

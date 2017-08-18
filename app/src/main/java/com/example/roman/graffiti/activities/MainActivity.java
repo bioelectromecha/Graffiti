@@ -20,6 +20,7 @@ import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
@@ -89,12 +90,6 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
         btnCapture.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                Random random = new Random();
-//                int x = random.nextInt(mCameraSurfaceView.getWidth());
-//                int y = random.nextInt(mCameraSurfaceView.getHeight());
-//                int size = random.nextInt(Math.min(x, y));
-//                mImageView.setMinimumHeight(size);
-//                mImageView.setMinimumWidth(size);
 
 //                ViewGroup.MarginLayoutParams marginParams = new ViewGroup.MarginLayoutParams(mImageView.getLayoutParams());
 //                marginParams.setMargins(x, y, 0, 0);
@@ -291,22 +286,51 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
             double ratio = LocationConfiguration.graffitySizeRatio(cameraLocation, mGraffitiLocation);
             int width = mCameraSurfaceView.getWidth();
             int height = mCameraSurfaceView.getHeight();
-
-            double bearingDif = LocationConfiguration.getHorizontalAngle(cameraLocation, mGraffitiLocation);
-
             if (ratio != 0) {
                 mImageView.setVisibility(View.VISIBLE);
                 width = (int) (width * ratio);
                 height = (int) (height * ratio);
-            }else{
+            } else {
                 mImageView.setVisibility(View.INVISIBLE);
             }
             mImageView.setMinimumHeight(height);
             mImageView.setMaxHeight(height);
             mImageView.setMinimumWidth(width);
             mImageView.setMaxWidth(width);
-            LogUtils.d("image size changed " + width+ " , " + height+" , " + ratio + " , "+ bearingDif);
         }
+    }
+
+    public void updateGraffitiPosition() {
+        int width = mCameraSurfaceView.getWidth();
+        int height = mCameraSurfaceView.getHeight();
+        if (mLocationHelper.getLastLocation() == null || mImageView == null) {
+            return;
+        }
+        Location cameraLocation = mLocationHelper.getLastLocation();
+        float bearingDiff = LocationConfiguration.getHorizontalAngle(cameraLocation, mGraffitiLocation, mCompass.getCompassBearing());
+
+        if (LocationConfiguration.isOnScreen(bearingDiff, camera.getParameters())) {
+            mImageView.setVisibility(View.VISIBLE);
+            double pixelMove = LocationConfiguration.convertWidthToPixels(bearingDiff, camera.getParameters(), width);
+//            ViewGroup.MarginLayoutParams marginParams = new ViewGroup.MarginLayoutParams(mImageView.getLayoutParams());
+//            marginParams.setMargins( (int)(pixelMove+(width/2)), 0, 0, 0);
+//            RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(marginParams);
+//            mImageView.setLayoutParams(layoutParams);
+//            LogUtils.d("pixelMove: " + pixelMove);
+
+            ViewGroup.MarginLayoutParams marginParams = new ViewGroup.MarginLayoutParams(mImageView.getLayoutParams());
+            int imageViewWidth = mImageView.getWidth();
+            int imageViewHeight = mImageView.getHeight();
+            marginParams.setMargins( (int)((width/2-imageViewWidth/2)), height/2-imageViewHeight/2, 0, 0);
+            RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(marginParams);
+            mImageView.setLayoutParams(layoutParams);
+            LogUtils.d("pixelMove: " + pixelMove);
+
+        } else {
+            mImageView.setVisibility(View.INVISIBLE);
+//            LogUtils.d("pixelMove: cannot show");
+        }
+
     }
 
 }

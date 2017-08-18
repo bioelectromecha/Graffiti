@@ -54,7 +54,7 @@ public class LocationHelper implements
     @Override
     public void onLocationChanged(Location location) {
         mLastLocation=location;
-        LogUtils.d("Location is: " + mLastLocation.getLatitude() + " , " + mLastLocation.getLongitude() + " , " + mLastLocation.getAltitude());
+//        LogUtils.d("Location is: " + mLastLocation.getLatitude() + " , " + mLastLocation.getLongitude() + " , " + mLastLocation.getAltitude());
         mCallbackActivity.updateGraffitiSize(mLastLocation);
     }
 

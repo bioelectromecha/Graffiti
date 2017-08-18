@@ -10,6 +10,12 @@ import android.view.animation.Animation;
 import android.view.animation.RotateAnimation;
 import android.widget.ImageView;
 
+import com.apkfuns.logutils.LogUtils;
+import com.example.roman.graffiti.activities.MainActivity;
+
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by roman on 8/17/17.
  */
@@ -22,14 +28,16 @@ public class Compass implements SensorEventListener {
     private Sensor msensor;
     private float[] mGravity = new float[3];
     private float[] mGeomagnetic = new float[3];
-    private float azimuth = 0f;
-    private float currectAzimuth = 0;
+    private float mAzimuth = 0f;
+    private float mCorrectAzimuth = 0;
 
     // compass arrow to rotate
-    public ImageView arrowView = null;
+    private MainActivity mMainActivity;
+    private LowPassFilter mLowPassFilter = new LowPassFilter();
 
-    public Compass(Context context) {
-        sensorManager = (SensorManager) context
+    public Compass(MainActivity mainActivity) {
+        mMainActivity = mainActivity;
+        sensorManager = (SensorManager) mMainActivity
                 .getSystemService(Context.SENSOR_SERVICE);
         gsensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         msensor = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
@@ -46,25 +54,8 @@ public class Compass implements SensorEventListener {
         sensorManager.unregisterListener(this);
     }
 
-    private void adjustArrow() {
-        if (arrowView == null) {
-            Log.i(TAG, "arrow view is not set");
-            return;
-        }
-
-        Log.i(TAG, "will set rotation from " + currectAzimuth + " to "
-                + azimuth);
-
-        Animation an = new RotateAnimation(-currectAzimuth, -azimuth,
-                Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF,
-                0.5f);
-        currectAzimuth = azimuth;
-
-        an.setDuration(500);
-        an.setRepeatCount(0);
-        an.setFillAfter(true);
-
-        arrowView.startAnimation(an);
+    public float getCompassBearing() {
+        return mAzimuth;
     }
 
     @Override
@@ -106,13 +97,17 @@ public class Compass implements SensorEventListener {
             if (success) {
                 float orientation[] = new float[3];
                 SensorManager.getOrientation(R, orientation);
-                // Log.d(TAG, "azimuth (rad): " + azimuth);
-                azimuth = (float) Math.toDegrees(orientation[0]); // orientation
-                azimuth = (azimuth + 360) % 360;
-                // Log.d(TAG, "azimuth (deg): " + azimuth);
-                adjustArrow();
+                // Log.d(TAG, "mAzimuth (rad): " + mAzimuth);
+                mAzimuth = (float) Math.toDegrees(orientation[0]); // orientation
+                mAzimuth = (mAzimuth + 90) % 360;
+                mAzimuth = mLowPassFilter.getAzimuth(mAzimuth);
+                updateMainActivity();
             }
         }
+    }
+
+    private void updateMainActivity() {
+        mMainActivity.updateGraffitiPosition();
     }
 
     @Override

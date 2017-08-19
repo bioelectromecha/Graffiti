@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "382160928183",
+    "firebase_url": "https://graffiti-2c283.firebaseio.com",
+    "project_id": "graffiti-2c283",
+    "storage_bucket": "graffiti-2c283.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:382160928183:android:863e85000f032774",
+        "android_client_info": {
+          "package_name": "com.example.roman.graffiti"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "382160928183-vsp0l2krk2m804fveqthc4mhshlfhpca.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAigrhcSFt_wTa-G7hlvzqhq9d9rmrCXg8"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

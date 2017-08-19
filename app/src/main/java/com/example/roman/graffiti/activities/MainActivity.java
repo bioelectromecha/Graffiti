@@ -1,6 +1,5 @@
 package com.example.roman.graffiti.activities;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.database.Cursor;
@@ -16,6 +15,7 @@ import android.os.Environment;
 import android.os.ParcelFileDescriptor;
 import android.provider.MediaStore;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -38,8 +38,15 @@ import java.io.FileDescriptor;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.List;
 
-public class MainActivity extends Activity implements SurfaceHolder.Callback {
+public class MainActivity extends AppCompatActivity implements SurfaceHolder.Callback {
+    //define callback interface
+    interface MyCallbackInterface {
+
+        void showItems(List<Image> result);
+    }
+
     private static final int RESULT_LOAD_IMAGE = 403;
 
     private Camera camera = null;
@@ -64,6 +71,13 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
         mLocationHelper = new LocationHelper(this);
         // TODO Auto-generated method stub
         super.onCreate(savedInstanceState);
+
+        ImagesManager manager = new ImagesManager(new MyCallbackInterface() {
+            @Override
+            public void showItems( List <Image> images) {
+                Log.e("sss","ss");
+            }
+        });
 
         getWindow().setFormat(PixelFormat.TRANSLUCENT);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -104,8 +118,8 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
 //                Intent i = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
 //                startActivityForResult(i, RESULT_LOAD_IMAGE);
 
-//                Intent intent = new Intent(getApplicationContext(),DrawActivity.class);
-//                startActivity(intent);
+                Intent intent = new Intent(getApplicationContext(),DrawActivity.class);
+                startActivity(intent);
 //                finish();
 
             }

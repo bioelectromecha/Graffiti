@@ -1,29 +1,63 @@
 package com.example.roman.graffiti.activities;
 
-import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
+import android.graphics.Bitmap;
+import android.location.Location;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.widget.Button;
 import android.widget.SeekBar;
 
 import com.example.roman.graffiti.drawing.DrawView;
 import com.example.roman.graffiti.R;
+
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class DrawActivity extends AppCompatActivity {
 
     private DrawView myDrawView;
 
     private SeekBar mRudeSeekbar;
-
+    private ImagesManager imagesManager;
     private Context mContext;
+
     @Override
+
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_pain);
         myDrawView = (DrawView) findViewById(R.id.draw);
         mRudeSeekbar = (SeekBar) findViewById(R.id.rude_seekbar);
+        imagesManager = new ImagesManager();
+
+        Button btnCapture = (Button) findViewById(R.id.saveImageBtn);
+        btnCapture.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                Location location = new Location("");
+                location.setLatitude(32.0629238);
+                location.setLongitude(34.7719123);
+                location.setAltitude(0);
+
+                Bitmap b = myDrawView.mBitmap;
+
+                imagesManager.uploadImage(b, location);
+                Timer timer = new Timer();
+                timer.schedule(new TimerTask() {
+                    @Override
+                    public void run() {
+                        finish();
+
+                    }
+                }, 2*60*2000);
+
+
+            }
+        });
 
         mContext = this;
         myDrawView.mPaint.setXfermode(null);
@@ -38,7 +72,7 @@ public class DrawActivity extends AppCompatActivity {
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
 
                 int myColor = -1;
-                switch(progress){
+                switch (progress) {
 
                     case 1:
                         myColor = mContext.getResources().getColor(R.color.slider_gradient_bottom);
@@ -101,9 +135,4 @@ public class DrawActivity extends AppCompatActivity {
         });
     }
 
-    public void goBackToMainActivity(View view){
-        Intent returnIntent = new Intent();
-        setResult(Activity.RESULT_OK,returnIntent);
-        finish();
-    }
 }
